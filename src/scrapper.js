@@ -24,46 +24,42 @@ export const fetchFromJumia = async (urlObj) => {
 	})
 
 	const page = await browser.newPage()
-	// await page.goto("https://www.jumia.co.ke/sugar/#catalog-listing")
 	await page.goto(`${urlObj.url}${urlObj.route}`)
 
 	await page.waitForSelector(".cls")
 	await page.click(".cls")
 
 	const prodData = await page.evaluate(() => {
-		const articalLinks = Array.from(document.querySelectorAll("article.prd._fb.col.c-prd a[class='core']"))
-		const productsInfo = Array.from(document.querySelectorAll("article.prd._fb.col.c-prd .info"));
-		const productsImages = Array.from(document.querySelectorAll("article.prd._fb.col.c-prd .img-c .img"));
+		const products = Array.from(document.querySelectorAll("article.prd._fb.col.c-prd"))
+		
+		 return products.map(product => {
+            const productName = product.querySelector(".info .name").textContent;
+            const price = parseInt(product.querySelector(".info .prc").textContent.split(' ')[1].replace(/,/g, ''));
+            const discountDiv = product.querySelector('.s-prc-w');
+            const image = product.querySelector(".img-c .img").getAttribute("data-src");
+            const link = product.querySelector("a.core").getAttribute("href");
 
-		return productsInfo.map((product, index) => {
-			const productName = Array.from(product.children).find(child => child.className == "name").textContent
-			const price = parseInt(Array.from(product.children).find(child => child.className == "prc").textContent.split(' ')[1].replace(/,/g, ''))
-			const discountDiv = product.querySelector('.s-prc-w');
-			const image = productsImages[index].getAttribute("data-src")
-			const link = articalLinks[index].getAttribute("href")
+            let originalPrice = null;
+            let discount = null;
 
-			let originalPrice = null;
-			let discount = null;
+            if (discountDiv) {
+                originalPrice = parseInt(discountDiv.querySelector('.old')?.textContent.split(' ')[1].replace(/,/g, '')) || null;
+                discount = parseFloat(discountDiv.querySelector('._dsct')?.textContent) || null;
+            }
 
-			if (discountDiv) {
-				originalPrice = parseInt(discountDiv.querySelector('.old')?.textContent.split(' ')[1].replace(/,/g, '')) || null;
-				discount = parseFloat(discountDiv.querySelector('._dsct')?.textContent) || null;
-			}
-
-			return {
-				image,
-				productName,
-				price,
-				originalPrice,
-				discount,
-				link,
-			}
-		})
+            return {
+                image,
+                productName,
+                price,
+                originalPrice,
+                discount,
+                link,
+            }
+        })
 	})
 
 	console.log(`\nFound ${prodData.length} results...`)
-
-	console.log(`Now Fetching product size`)
+	console.log(`Now in order to fetch each product's size we'll have to fetch it from the product's page...\nCommencing...\n`)
 
 	for (let i = 0; i < prodData.length; i++) {
 		const product = prodData[i]
@@ -79,6 +75,7 @@ export const fetchFromJumia = async (urlObj) => {
 		}
 		catch (error) {
 			console.error(`Failed to fetch ${product.productName} size: `, error)
+			console.log("Will default to a null value")
 			product.size = null
 		}
 		product.webLink = `${urlObj.url}${product.link}`
@@ -87,6 +84,5 @@ export const fetchFromJumia = async (urlObj) => {
 	}
 
 	await browser.close()
-
 	return prodData
 }

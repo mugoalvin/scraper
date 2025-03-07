@@ -17,17 +17,23 @@ const urlObjs = [
 
 await initDatabase()
 
-// urlObjs.forEach(async urlObj => {
-//	const listOfSugar = await fetchFromJumia(urlObj)
-//	await saveToPostgres(listOfSugar)
-//});
+
+urlObjs.forEach(async urlObj => {
+	try {
+		const listOfSugar = await fetchFromJumia(urlObj)
+		await saveToPostgres(listOfSugar)
+	}
+	catch (error) {
+		console.error(`Failed to process data for ${urlObj.country}:`, error)
+	}
+});
 
 
- for (const urlObj of urlObjs) {
-     try {
-         const listOfSugar = await fetchFromJumia(urlObj)
-         await saveToPostgres(listOfSugar)
-     } catch (error) {
-         console.error(`Failed to process data for ${urlObj.country}:`, error)
-     }
- }
+// for (const urlObj of urlObjs) {
+// 	try {
+// 		const listOfSugar = await fetchFromJumia(urlObj)
+// 		await saveToPostgres(listOfSugar)
+// 	} catch (error) {
+// 		console.error(`Failed to process data for ${urlObj.country}:`, error)
+// 	}
+// }

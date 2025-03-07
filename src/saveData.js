@@ -3,9 +3,6 @@ import { Sugar } from "../Entities/sugar.js"
 
 export const saveToPostgres = async (listOfSugar) => {
 	const currentTime = new Date()
-
-	console.log(listOfSugar)
-
 	const timeStampedSugarList = listOfSugar.map(sugar => {
 		return	{ ...sugar, timestamp:  currentTime }
 	})
