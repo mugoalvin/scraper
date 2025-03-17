@@ -1,39 +1,31 @@
 import { initDatabase } from './src/DB.js'
 import { fetchFromJumia } from './src/scrapper.js'
 import { saveToPostgres } from './src/saveData.js'
-
-const urlObjs = [
-	{
-		country: "Kenya",
-		url: "https://www.jumia.co.ke",
-		route: "/sugar/#catalog-listing/"
-	},
-	{
-		country: "Uganda",
-		url: "https://www.jumia.ug",
-		route: "/sugar-3999/"
-	}
-]
+import { validateProduct } from './src/validation.js'
+import dotenv from 'dotenv'
 
 await initDatabase()
 
+dotenv.config()
 
-urlObjs.forEach(async urlObj => {
+// Declaring target urls
+const targetUrlObjs = JSON.parse(process.env.URL_OBJS.replace(/'/g, '"'));
+
+targetUrlObjs.forEach(async targetUrlObj => {
 	try {
-		const listOfSugar = await fetchFromJumia(urlObj)
-		await saveToPostgres(listOfSugar)
+		const listOfSugarProducts = await fetchFromJumia(targetUrlObj)
+		const validProducts = listOfSugarProducts.filter(sugarProduct => {
+			try {
+				return validateProduct(sugarProduct)
+			}
+			catch (error) {
+				console.error(`Validation failed for product: ${sugarProduct.productName}`, error.message)
+				return false
+			}
+		})
+		await saveToPostgres(validProducts)
 	}
 	catch (error) {
-		console.error(`Failed to process data for ${urlObj.country}:`, error)
+		console.error(`Failed to process data for ${targetUrlObj.country}:`, error)
 	}
-});
-
-
-// for (const urlObj of urlObjs) {
-// 	try {
-// 		const listOfSugar = await fetchFromJumia(urlObj)
-// 		await saveToPostgres(listOfSugar)
-// 	} catch (error) {
-// 		console.error(`Failed to process data for ${urlObj.country}:`, error)
-// 	}
-// }
+})

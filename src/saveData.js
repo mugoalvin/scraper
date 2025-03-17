@@ -7,7 +7,6 @@ export const saveToPostgres = async (listOfSugar) => {
 		return	{ ...sugar, timestamp:  currentTime }
 	})
 
-	console.log(timeStampedSugarList)
 
 	await AppDataSource
 		.createQueryBuilder()
@@ -19,7 +18,7 @@ export const saveToPostgres = async (listOfSugar) => {
 			console.log("\nData has been entered in to the database\n")
 		})
 		.catch(error => {
-			console.error(error)
+			throw new Error(`Failed to insert data to the database: ${error.message}`)
 		})
 		.finally(() => {
 			console.log(`Done with products from ${timeStampedSugarList.country}\n`)

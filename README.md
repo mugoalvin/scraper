@@ -21,7 +21,10 @@ npm install
 ```
 
 ### 3. Set Up Database
-Ensure you have PostgreSQL installed and configured. The database connection is managed via `AppDataSource` in `DB.js`. Adjust database credentials accordingly.
+Ensure you have PostgreSQL installed and configured.
+You can configure the app's environment variables by generating your `.env` file.
+Template for the `.env` file can be found in the `.env.example` file.
+Adjust database credentials accordingly.
 
 ### 4. Run the Scraper
 ```sh
@@ -31,13 +34,13 @@ node .
 ## Project Structure
 ```
 📁 project-directory
-├── index.js        # Main entry point
+├── index.js			# Main entry point
 ├── src
-│   ├── DB.js       # Database connection
-│   ├── scrapper.js # Scrapes product data from Jumia
-│   ├── saveData.js # Saves scraped data to PostgreSQL
+│   ├── DB.js			 # Database connection
+│   ├── scrapper.js  # Scrapes product data from Jumia
+│   ├── saveData.js  # Saves scraped data to PostgreSQL
 ├── Entities
-│   ├── sugar.js # Sugar product entity
+│   ├── sugar.js	   # Sugar product entity
 ```
 
 ## Dependencies
@@ -49,8 +52,6 @@ node .
 ## Notes
 - The script runs in headless mode by default.
 - Make sure the database is properly configured before running the script.
-- Modify `urlObjs` in `index.js` to scrape data from different categories.
 
 ## License
 This project is for educational purposes only.
-

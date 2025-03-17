@@ -1,15 +1,18 @@
 import { DataSource } from 'typeorm'
 import { Sugar } from '../Entities/sugar.js'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 export const AppDataSource = new DataSource({
-	type: "postgres",
-    host: "localhost",
-	port: 5432,
-    username: "alvin",
-	password: 'password123',
-	database: 'jumia',
+	type: process.env.DATABASE_TYPE,
+    host: process.env.HOST,
+	port: process.env.PORT,
+    username: process.env.USERNAME,
+	password: process.env.PASSWORD,
+	database: process.env.DATABASE_NAME,
 	entities: [ Sugar ],
-	synchronize: true
+	synchronize: process.env.SYNCHRONIZE
 })
 
 
